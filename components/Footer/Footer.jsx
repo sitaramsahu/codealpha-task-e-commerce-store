@@ -7,6 +7,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -16,7 +17,13 @@ const Footer = () => {
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
         {/* Column 1 - Brand Info */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">ASRS Store</h2>
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <ShoppingBag className="text-blue-600 w-6 h-6" />
+            <span className="text-xl font-semibold text-gray-800">
+              Shop<span className="text-blue-600">Ease</span>
+            </span>
+          </Link>{" "}
           <p className="text-sm">
             Your one-stop shop for digital and daily essentials. Trusted
             quality, affordable prices.
