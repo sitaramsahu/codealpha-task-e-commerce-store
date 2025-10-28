@@ -18,12 +18,23 @@ const Footer = () => {
         {/* Column 1 - Brand Info */}
         <div>
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <ShoppingBag className="text-blue-600 w-6 h-6" />
-            <span className="text-xl font-semibold text-gray-800">
-              Shop<span className="text-blue-600">Ease</span>
-            </span>
-          </Link>{" "}
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/readyatra-logo.png"
+              width={60}
+              height={40}
+              alt="Readyatra Logo"
+            />
+
+            <div className="flex flex-col leading-tight">
+              <span className="text-xl font-bold text-gray-100">
+                Read<span className="text-blue-600">Yatra</span>
+              </span>
+              <span className="text-sm text-gray-500 italic">
+                Har Kitaab, Ek Nayi Yatra
+              </span>
+            </div>
+          </Link>
           <p className="text-sm">
             Your one-stop shop for digital and daily essentials. Trusted
             quality, affordable prices.
