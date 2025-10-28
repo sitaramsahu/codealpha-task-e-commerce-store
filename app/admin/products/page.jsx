@@ -1,4 +1,6 @@
 "use client";
+import AdminNavbar from "@/components/Navbar/AdminNavbar";
+import ProductsGrid from "@/components/Products/ProductGridAdmin";
 import { useEffect, useState } from "react";
 
 export default function AdminProducts() {
@@ -46,7 +48,13 @@ export default function AdminProducts() {
       const data = await res.json();
       if (res.ok) {
         setProducts([...products, data]);
-        setProductData({ title: "", category: "", price: "", image: "" });
+        setProductData({
+          title: "",
+          category: "",
+          description: "",
+          price: "",
+          image: "",
+        });
         setMessage("Product added successfully!");
       } else {
         setMessage(data.error || "Failed to add product");
@@ -62,6 +70,7 @@ export default function AdminProducts() {
 
   return (
     <div className="p-6">
+      <AdminNavbar />
       <h1 className="text-3xl font-semibold mb-6 text-center">
         🛍️ Admin Panel
       </h1>
@@ -79,6 +88,16 @@ export default function AdminProducts() {
             value={productData.title}
             onChange={(e) =>
               setProductData({ ...productData, title: e.target.value })
+            }
+            required
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            className="w-full border p-2 rounded"
+            value={productData.description}
+            onChange={(e) =>
+              setProductData({ ...productData, description: e.target.value })
             }
             required
           />
@@ -125,23 +144,10 @@ export default function AdminProducts() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <div
-            key={product._id}
-            className="border rounded-xl p-4 shadow hover:shadow-lg transition"
-          >
-            <img
-              src={product.image}
-              alt={product.title}
-              className="w-full h-48 object-cover rounded"
-            />
-            <h2 className="text-lg font-bold mt-2">{product.title}</h2>
-            <p className="text-gray-600 text-sm">{product.category}</p>
-            <p className="text-blue-600 font-semibold mt-2">₹{product.price}</p>
-          </div>
-        ))}
-      </div>
+      <ProductsGrid
+        products={products}
+        refreshProducts={() => setProducts([...products])}
+      />
     </div>
   );
 }

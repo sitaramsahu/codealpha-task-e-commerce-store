@@ -1,20 +1,39 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import React, { use, useEffect, useState } from "react";
 
 export default function ProductDetail({ params }) {
+  // ✅ Unwrap the params Promise
+  const { id } = use(params);
+
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/products/${params.id}`)
+    fetch(`/api/products/${id}`)
       .then((res) => res.json())
-      .then(setProduct);
-  }, [params.id]);
+      .then(setProduct)
+      .catch((err) => console.error("Error fetching product:", err));
+  }, [id]);
 
   const addToCart = () => {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({ ...product, quantity: 1 });
+    const existing = cart.find((item) => item._id === product._id);
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
     localStorage.setItem("cart", JSON.stringify(cart));
     alert("Added to cart!");
+  };
+
+  const proceedToBuy = () => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({ ...product, quantity: 1 });
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.location.href = "/checkout";
   };
 
   if (!product) return <div className="p-6">Loading...</div>;
@@ -24,7 +43,7 @@ export default function ProductDetail({ params }) {
       <img
         src={product.image}
         alt={product.title}
-        className="w-full md:w-1/2 h-72 object-cover rounded"
+        className="w-full md:w-1/2 h-120 object-contain rounded"
       />
       <div>
         <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
@@ -34,9 +53,15 @@ export default function ProductDetail({ params }) {
         </p>
         <button
           onClick={addToCart}
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white py-2 px-4 rounded-2xl hover:bg-blue-700"
         >
           Add to Cart
+        </button>
+        <button
+          onClick={proceedToBuy}
+          className="bg-blue-600 text-white py-2 px-4 rounded-2xl ml-4 hover:bg-blue-700"
+        >
+          Proceed to Buy
         </button>
       </div>
     </div>

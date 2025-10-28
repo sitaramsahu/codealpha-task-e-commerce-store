@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ShopEase - Your One-Stop Online Store",
-  description: "ShopEase offers a wide range of products at unbeatable prices.",
+  title: "                Read Yatra - Har Kitaab, Ek Nayi Yatra",
+  description: "Read Yatra offers a wide range of books at unbeatable prices.",
 };
 
 export default function RootLayout({ children }) {
