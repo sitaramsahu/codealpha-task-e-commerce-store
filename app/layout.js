@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "                Read Yatra - Har Kitaab, Ek Nayi Yatra",
   description: "Read Yatra offers a wide range of books at unbeatable prices.",
+  icons: {
+    icon: "/readyatra-logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
