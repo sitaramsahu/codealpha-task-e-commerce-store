@@ -4,6 +4,11 @@ import { User } from "lucide-react";
 import Image from "next/image";
 
 export default function AdminNavbar({ onLogout }) {
+  const handleonLogout = () => {
+    //go to home page and clear local storage
+
+    window.location.href = "/";
+  };
   return (
     <>
       <nav className="bg-white shadow-md sticky top-0 z-50 text-black">
@@ -36,7 +41,7 @@ export default function AdminNavbar({ onLogout }) {
               Users
             </Link>
             <button
-              onClick={onLogout}
+              onClick={handleonLogout}
               className="flex items-center gap-1 text-red-600 hover:text-red-800"
             >
               <User className="w-5 h-5" /> Logout
