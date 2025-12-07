@@ -6,12 +6,6 @@ import { PenBoxIcon, Plus } from "lucide-react";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
-  const [productData, setProductData] = useState({
-    title: "",
-    category: "",
-    price: "",
-    image: "",
-  });
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
 
@@ -37,43 +31,22 @@ export default function ProductsPage() {
       .catch((err) => console.error("Error fetching products:", err));
   }, []);
 
-  // ✅ Add product (admin only)
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(productData),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setProducts([...products, data]);
-        setProductData({ title: "", category: "", price: "", image: "" });
-        setMessage("✅ Product added successfully!");
-      } else {
-        setMessage(data.error || "Failed to add product");
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage("Error adding product");
-    }
-  };
-
   // ✅ Add to cart (backend)
   const handleAddToCart = async (product) => {
+    const token = localStorage.getItem("token");
+
+    // 🚨 If user is NOT logged in → redirect
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           productId: product._id,
@@ -85,6 +58,7 @@ export default function ProductsPage() {
       });
 
       const data = await res.json();
+
       if (res.ok) {
         alert("✅ Added to cart!");
       } else {
@@ -97,62 +71,97 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center">
-        🛍️ Our Products
-      </h1>
+    <div className="p-6 max-w-6xl mx-auto">
+      {/* Top Bar: Title + Admin Action */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6">
+        <h1 className="text-3xl font-semibold text-center md:text-left">
+          🛍️ Our Products
+        </h1>
+
+        {user?.role === "admin" && (
+          <Link href="/admin/products">
+            <Button className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Add New Product
+            </Button>
+          </Link>
+        )}
+      </div>
 
       {message && (
         <p className="text-center text-green-600 font-medium mb-4">{message}</p>
       )}
 
+      {/* Empty State */}
+      {products.length === 0 && (
+        <div className="text-center text-gray-500 py-10">
+          <p className="text-lg mb-2">No products available right now.</p>
+          <p className="text-sm">
+            Please check back later or explore other sections of ReadYatra.
+          </p>
+        </div>
+      )}
+
       {/* 🛒 Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <div
-            key={product._id}
-            className="border rounded-xl p-4 shadow hover:shadow-lg transition"
-          >
-            <img
-              src={product.image}
-              alt={product.title}
-              className="w-full h-80 object-contain rounded"
-            />
-            <h2 className="text-lg font-bold mt-2">{product.title}</h2>
-            <p className="text-gray-600 text-sm">{product.category}</p>
-            <p className="text-blue-600 font-semibold mt-2">₹{product.price}</p>
+      {products.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <div
+              key={product._id}
+              className="border rounded-xl p-4 shadow hover:shadow-lg transition bg-white"
+            >
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-80 object-contain rounded mb-2"
+              />
 
-            <div className="flex flex-wrap gap-2 mt-3">
-              <Link href={`/products/${product._id}`}>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  View Details
+              <h2 className="text-lg font-bold mt-1 line-clamp-2">
+                {product.title}
+              </h2>
+              <p className="text-gray-600 text-sm">{product.category}</p>
+
+              {product.description && (
+                <p className="text-gray-500 text-xs mt-1 line-clamp-3">
+                  {product.description}
+                </p>
+              )}
+
+              <p className="text-blue-600 font-semibold mt-2">
+                ₹{product.price}
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-3">
+                <Link href={`/products/${product._id}`}>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    View Details
+                  </Button>
+                </Link>
+
+                <Button
+                  onClick={() => handleAddToCart(product)}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Add to Cart
                 </Button>
-              </Link>
 
-              <Button
-                onClick={() => handleAddToCart(product)}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                Add to Cart
-              </Button>
-
-              {/* ✅ Admin edit button */}
-              {user?.role === "admin" && (
-                <div className="flex gap-2">
-                  <Link href={"/admin/products"}>
+                {/* ✅ Admin edit button */}
+                {user?.role === "admin" && (
+                  <Link href={`/admin/products/${product._id}`}>
                     <Button
-                      variant="secondary"
-                      className="bg-white hover:bg-gray-200"
+                      variant="outline"
+                      className="flex items-center gap-1"
                     >
-                      <Plus className="w-4 h-4 mr-1" /> Add New Product
+                      <PenBoxIcon className="w-4 h-4" />
+                      Edit
                     </Button>
                   </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
