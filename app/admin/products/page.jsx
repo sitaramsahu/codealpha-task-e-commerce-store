@@ -70,7 +70,6 @@ export default function AdminProducts() {
 
   return (
     <div className="p-6">
-      <AdminNavbar />
       <h1 className="text-3xl font-semibold mb-6 text-center">
         🛍️ Admin Panel
       </h1>
