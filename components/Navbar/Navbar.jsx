@@ -1,57 +1,79 @@
 "use client";
+
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ShoppingBag, Menu, X, User } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false); // mobile menu
+  const [open, setOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // new: check user role
-  const [accountOpen, setAccountOpen] = useState(false); // account dropdown
+  const [role, setRole] = useState("user");
 
-  // 🛒 Update cart badge
+  const router = useRouter();
+  const accountRef = useRef(null);
+
+  // 🟢 Decode user from JWT token
   useEffect(() => {
-    const updateCartCount = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setUser({ name: payload.name, email: payload.email });
+      setRole(payload.role || "user");
+    } catch (error) {
+      console.error("Invalid token", error);
+    }
+  }, []);
+
+  // 🛒 Cart count from backend or fallback localStorage
+  useEffect(() => {
+    const updateCount = () => {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
       setCartCount(cart.length);
     };
-    updateCartCount();
-    window.addEventListener("storage", updateCartCount);
-    return () => window.removeEventListener("storage", updateCartCount);
+    updateCount();
+    window.addEventListener("storage", updateCount);
+    return () => window.removeEventListener("storage", updateCount);
   }, []);
 
-  // 👤 Check login status + role
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("role"); // assume you store "admin" or "user"
-    setUser(token ? true : false);
-    setRole(userRole || "user");
-  }, []);
-
+  // 🔒 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
     setUser(null);
     setRole("user");
     setAccountOpen(false);
+    router.push("/login");
   };
+
+  // 🧊 Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (accountRef.current && !accountRef.current.contains(e.target)) {
+        setAccountOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <>
-      {/* 🔹 Main Navbar */}
+      {/* MAIN NAVBAR */}
       <nav className="bg-white shadow-md sticky top-0 z-50 text-black">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-3">
-          {/* Logo */}
+          {/* LOGO */}
           <Link href="/" className="flex items-center gap-3">
             <Image
               src="/readyatra-logo.png"
-              width={60}
+              width={55}
               height={40}
-              alt="Readyatra Logo"
+              alt="logo"
             />
-
             <div className="flex flex-col leading-tight">
               <span className="text-xl font-bold text-gray-800">
                 Read<span className="text-blue-600">Yatra</span>
@@ -62,8 +84,14 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Links */}
+          {/* DESKTOP LINKS */}
           <div className="hidden md:flex gap-6 items-center">
+            <Link href="/about" className="hover:text-blue-600">
+              About Us
+            </Link>
+            <Link href="/contact" className="hover:text-blue-600">
+              Contact Us
+            </Link>
             <Link href="/products" className="hover:text-blue-600">
               Products
             </Link>
@@ -71,9 +99,9 @@ export default function Navbar() {
               Orders
             </Link>
 
-            {/* Cart */}
-            <Link href="/cart" className="relative">
-              <ShoppingBag className="w-5 h-5 text-gray-700 hover:text-blue-600" />
+            {/* CART */}
+            <Link href="/cart" className="relative hover:text-blue-600">
+              <ShoppingBag className="w-6 h-6 text-gray-700" />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full px-1.5">
                   {cartCount}
@@ -81,18 +109,18 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Account Dropdown */}
-            <div className="relative">
+            {/* ACCOUNT MENU */}
+            <div ref={accountRef} className="relative">
               <button
                 onClick={() => setAccountOpen(!accountOpen)}
                 className="flex items-center gap-2 hover:text-blue-600"
               >
                 <User className="w-5 h-5" />
-                <span>{user ? "Account" : "Login"}</span>
+                {user ? user.name?.split(" ")[0] : "Account"}
               </button>
 
               {accountOpen && (
-                <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded-md w-36 z-50">
+                <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded-md w-40 z-50">
                   {user ? (
                     <>
                       <Link
@@ -102,15 +130,17 @@ export default function Navbar() {
                       >
                         My Orders
                       </Link>
+
                       {role === "admin" && (
                         <Link
                           href="/admin/profile"
                           className="block px-4 py-2 hover:bg-gray-100"
                           onClick={() => setAccountOpen(false)}
                         >
-                          Admin Panel
+                          Admin Profile
                         </Link>
                       )}
+
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
@@ -123,23 +153,14 @@ export default function Navbar() {
                       <Link
                         href="/login"
                         className="block px-4 py-2 hover:bg-gray-100"
-                        onClick={() => setAccountOpen(false)}
                       >
                         Login
                       </Link>
                       <Link
                         href="/register"
                         className="block px-4 py-2 hover:bg-gray-100"
-                        onClick={() => setAccountOpen(false)}
                       >
                         Register
-                      </Link>
-                      <Link
-                        href="/admin/login"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                        onClick={() => setAccountOpen(false)}
-                      >
-                        Admin Login
                       </Link>
                     </>
                   )}
@@ -148,119 +169,90 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* MOBILE MENU BUTTON */}
           <button
             onClick={() => setOpen(!open)}
             className="md:hidden text-gray-700"
           >
-            {open ? <X /> : <Menu />}
+            {open ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
-        {/* 🔸 Mobile Dropdown */}
+        {/* MOBILE MENU */}
         {open && (
           <div className="md:hidden bg-white border-t shadow-sm">
+            <Link href="/about" className="hover:text-blue-600">
+              About Us
+            </Link>
+            <Link href="/contact" className="hover:text-blue-600">
+              Contact Us
+            </Link>
             <Link
               href="/products"
-              className="block px-6 py-2 hover:bg-gray-100"
-              onClick={() => setOpen(false)}
+              className="block px-6 py-3 hover:bg-gray-100"
             >
               Products
             </Link>
-            <Link
-              href="/orders"
-              className="block px-6 py-2 hover:bg-gray-100"
-              onClick={() => setOpen(false)}
-            >
+            <Link href="/orders" className="block px-6 py-3 hover:bg-gray-100">
               Orders
             </Link>
-            <Link
-              href="/cart"
-              className="block px-6 py-2 hover:bg-gray-100"
-              onClick={() => setOpen(false)}
-            >
+            <Link href="/cart" className="block px-6 py-3 hover:bg-gray-100">
               Cart ({cartCount})
             </Link>
 
-            {user ? (
-              <>
-                <Link
-                  href="/orders"
-                  className="block px-6 py-2 hover:bg-gray-100"
-                  onClick={() => setOpen(false)}
-                >
-                  My Orders
-                </Link>
-                {role === "admin" && (
-                  <>
-                    <Link
-                      href="/admin/profile"
-                      className="block px-6 py-2 hover:bg-gray-100"
-                      onClick={() => setOpen(false)}
-                    >
-                      Admin Profile
-                    </Link>
-                    <Link
-                      href="/admin/product"
-                      className="block px-6 py-2 hover:bg-gray-100"
-                      onClick={() => setOpen(false)}
-                    >
-                      Admin Product
-                    </Link>
-                    <Link
-                      href="/admin/checkout"
-                      className="block px-6 py-2 hover:bg-gray-100"
-                      onClick={() => setOpen(false)}
-                    >
-                      Admin Checkout
-                    </Link>
-                  </>
-                )}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setOpen(false);
-                  }}
-                  className="block w-full text-left px-6 py-2 text-red-600 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
+            {!user ? (
               <>
                 <Link
                   href="/login"
-                  className="block px-6 py-2 hover:bg-gray-100"
-                  onClick={() => setOpen(false)}
+                  className="block px-6 py-3 hover:bg-gray-100"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-6 py-2 hover:bg-gray-100"
-                  onClick={() => setOpen(false)}
+                  className="block px-6 py-3 hover:bg-gray-100"
                 >
                   Register
                 </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/orders"
+                  className="block px-6 py-3 hover:bg-gray-100"
+                >
+                  My Orders
+                </Link>
+
+                {role === "admin" && (
+                  <Link
+                    href="/admin/profile"
+                    className="block px-6 py-3 hover:bg-gray-100"
+                  >
+                    Admin Profile
+                  </Link>
+                )}
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-6 py-3 text-red-600 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
               </>
             )}
           </div>
         )}
       </nav>
 
-      {/* 🔹 Admin Navbar (Visible Only if Admin Logged In) */}
+      {/* ADMIN NAVBAR */}
       {user && role === "admin" && (
-        <div className="bg-blue-50 border-t border-blue-200 shadow-sm py-2">
+        <div className="bg-blue-50 border-t border-blue-200 py-2 shadow-sm">
           <div className="max-w-7xl mx-auto flex justify-center gap-8 text-blue-700 font-medium">
-            <Link href="/admin/profile" className="hover:text-blue-900">
-              Admin Profile
-            </Link>
-            <Link href="/admin/product" className="hover:text-blue-900">
-              Admin Product
-            </Link>
-            <Link href="/admin/checkout" className="hover:text-blue-900">
-              Admin Checkout
-            </Link>
+            <Link href="/admin/profile">Admin Profile</Link>
+            <Link href="/admin/product">Admin Product</Link>
+            <Link href="/admin/checkout">Admin Checkout</Link>
+            <Link href="/contact">Contacts</Link>
           </div>
         </div>
       )}
