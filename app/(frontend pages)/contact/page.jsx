@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 export default function ContactPage() {
   const [contacts, setContacts] = useState([]);
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState("user");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,6 +13,20 @@ export default function ContactPage() {
     screenshot: "", // File object
   });
   const [loading, setLoading] = useState(false);
+
+  // 🟢 Decode user from JWT token
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setUser({ name: payload.name, email: payload.email });
+      setRole(payload.role || "user");
+    } catch (error) {
+      console.error("Invalid token", error);
+    }
+  }, []);
 
   // Fetch all contacts
   async function fetchContacts() {
@@ -145,39 +161,43 @@ export default function ContactPage() {
       </form>
 
       {/* Contact List */}
-      <h2 className="text-2xl font-semibold mt-8 mb-4">Saved Contacts</h2>
-      <ul className="space-y-3">
-        {contacts.length > 0 ? (
-          contacts.map((contact) => (
-            <li
-              key={contact._id}
-              className="p-4 border rounded-lg flex justify-between items-center"
-            >
-              <div>
-                <p className="font-bold">{contact.name}</p>
-                <p className="text-sm text-gray-600">{contact.email}</p>
-                <p>{contact.message}</p>
-                {contact.screenshot && (
-                  <p className="text-xs text-gray-400">
-                    File: {contact.screenshot}
-                  </p>
-                )}
-                <p className="text-xs text-gray-400">
-                  {new Date(contact.createdAt).toLocaleString()}
-                </p>
-              </div>
-              <button
-                onClick={() => handleDelete(contact._id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              >
-                Delete
-              </button>
-            </li>
-          ))
-        ) : (
-          <p className="text-gray-600">No contacts yet.</p>
-        )}
-      </ul>
+      {user && role === "admin" && (
+        <div>
+          <h2 className="text-2xl font-semibold mt-8 mb-4">Saved Contacts</h2>
+          <ul className="space-y-3">
+            {contacts.length > 0 ? (
+              contacts.map((contact) => (
+                <li
+                  key={contact._id}
+                  className="p-4 border rounded-lg flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-bold">{contact.name}</p>
+                    <p className="text-sm text-gray-600">{contact.email}</p>
+                    <p>{contact.message}</p>
+                    {contact.screenshot && (
+                      <p className="text-xs text-gray-400">
+                        File: {contact.screenshot}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-400">
+                      {new Date(contact.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(contact._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))
+            ) : (
+              <p className="text-gray-600">No contacts yet.</p>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
