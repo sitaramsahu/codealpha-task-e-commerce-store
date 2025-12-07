@@ -88,3 +88,22 @@ export async function DELETE(req, { params }) {
     );
   }
 }
+
+// ✅ GET - Fetch user details
+export async function GET(req, { params }) {
+  try {
+    await connectDB();
+    const user = await User.findById(params.id).select("-password");
+
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json(user, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch user" },
+
+      { status: 500 }
+    );
+  }
+}
