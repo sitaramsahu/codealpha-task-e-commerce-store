@@ -45,10 +45,11 @@ export default function Home() {
       {/* Hero Section */}
       <header className="text-center text-white mb-10 px-4">
         <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-          Welcome to <span className="text-green-400">ShopEase</span>
+          Welcome to <span className="text-green-400">ReadYatra</span>
         </h1>
         <p className="text-lg md:text-2xl text-gray-200">
-          Your one-stop destination for smart shopping
+          Your one-stop shop for digital and daily essentials. Trusted quality,
+          affordable prices.
         </p>
       </header>
 
@@ -58,7 +59,7 @@ export default function Home() {
         className="flex items-center gap-3 text-white hover:text-green-300 transition-colors"
       >
         <ShoppingBag className="w-8 h-8" />
-        <span className="text-xl md:text-2xl font-semibold">ShopEase</span>
+        <span className="text-xl md:text-2xl font-semibold">Books</span>
       </Link>
 
       {/* CTA Buttons */}
@@ -67,7 +68,7 @@ export default function Home() {
           href="/products"
           className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-400 transition"
         >
-          Browse Products
+          Browse Books
         </Link>
         <Link
           href="/login"
