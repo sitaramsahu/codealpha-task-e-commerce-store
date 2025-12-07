@@ -20,6 +20,7 @@ export default function AdminLogin() {
       if (res.ok) {
         localStorage.setItem("token", data.token);
         setMessage("Login successful! Redirecting to admin panel...");
+        window.location.reload();
         setTimeout(() => router.push("/admin/products"), 1000);
       } else {
         setMessage(data.error || "Login failed");
