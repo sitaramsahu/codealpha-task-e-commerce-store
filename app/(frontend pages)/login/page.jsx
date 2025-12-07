@@ -30,6 +30,7 @@ export default function LoginPage() {
 
       // Redirect to previous page or product page
       router.push(redirectTo);
+      window.location.reload();
     } else {
       setError(data.error || "Invalid login, please try again");
     }
