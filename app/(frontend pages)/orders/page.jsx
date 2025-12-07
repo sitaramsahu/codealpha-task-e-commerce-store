@@ -64,7 +64,7 @@ export default function OrdersPage() {
       <div className="text-center p-8 max-w-md mx-auto">
         <h1 className="text-3xl font-semibold mb-3">📦 My Orders</h1>
         <p className="text-gray-600 mb-4">
-          Please login to view your ReadyAtra order history.
+          Please login to view your ReadYatra order history.
         </p>
         <button
           onClick={() => router.push("/login?redirect=/orders")}
@@ -81,7 +81,7 @@ export default function OrdersPage() {
       <h1 className="text-3xl font-semibold mb-2 text-center">📦 My Orders</h1>
       <p className="text-center text-gray-600 mb-8">
         Welcome, <span className="font-semibold text-black">{user.name}</span>.
-        Here&apos;s your ReadyAtra journey summary.
+        Here&apos;s your ReadYatra journey summary.
       </p>
 
       {orders.length === 0 ? (
