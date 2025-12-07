@@ -127,7 +127,7 @@ const Footer = () => {
           </div>
           <div className="flex items-center space-x-2 text-sm">
             <Mail size={18} className="text-yellow-400" />
-            <span>support@asrsstore.in</span>
+            <span>support@readyatra.com</span>
           </div>
         </div>
       </div>
@@ -135,7 +135,7 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="border-t border-gray-700 mt-8 pt-4 text-center text-sm">
         © {new Date().getFullYear()}{" "}
-        <span className="text-white font-semibold">ASRS Store</span>. All Rights
+        <span className="text-white font-semibold">ReadYatra</span>. All Rights
         Reserved.
       </div>
     </footer>
