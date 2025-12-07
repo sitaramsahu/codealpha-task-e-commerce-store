@@ -39,42 +39,56 @@ export default function Home() {
         />
       ))}
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/80 -z-10"></div>
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/80 -z-10" />
 
       {/* Hero Section */}
-      <header className="text-center text-white mb-10 px-4">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+      <header className="text-center text-white mb-10 px-4 max-w-3xl">
+        {/* Logo & Tagline Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gray-900 border border-white/20 text-sm mb-4 backdrop-blur">
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/readyatra-logo.png"
+              width={60}
+              height={40}
+              alt="Readyatra Logo"
+            />
+            <div className="flex flex-col leading-tight">
+              <span className="text-xl font-bold text-gray-100">
+                Read<span className="text-blue-600">Yatra</span>
+              </span>
+
+              <span className="text-sm text-gray-500 italic">
+                Har Kitaab, Ek Nayi Yatra
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg leading-tight">
           Welcome to <span className="text-green-400">ReadYatra</span>
         </h1>
-        <p className="text-lg md:text-2xl text-gray-200">
-          Your one-stop shop for digital and daily essentials. Trusted quality,
-          affordable prices.
+
+        <p className="text-lg md:text-2xl text-gray-200 leading-relaxed">
+          Discover a world of books that inspire, inform, and ignite
+          imagination. Every page begins a new journey with ReadYatra — your
+          trusted space for meaningful reads and smooth online shopping.
         </p>
       </header>
 
-      {/* Logo */}
-      <Link
-        href="/"
-        className="flex items-center gap-3 text-white hover:text-green-300 transition-colors"
-      >
-        <ShoppingBag className="w-8 h-8" />
-        <span className="text-xl md:text-2xl font-semibold">Books</span>
-      </Link>
-
       {/* CTA Buttons */}
-      <div className="mt-10 flex gap-4">
+      <div className="mt-10 flex flex-wrap gap-4 justify-center">
         <Link
           href="/products"
-          className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-400 transition"
+          className="px-8 py-3 bg-green-500 text-white rounded-full hover:bg-green-400 transition shadow-lg shadow-green-500/30 text-sm md:text-base font-medium"
         >
           Browse Books
         </Link>
         <Link
           href="/login"
-          className="px-6 py-2 border border-green-400 text-white rounded-md hover:bg-green-50 hover:text-green-600 transition"
+          className="px-8 py-3 border border-green-400 text-white rounded-full hover:bg-white hover:text-green-700 transition text-sm md:text-base font-medium bg-white/5"
         >
-          Login
+          Login / Register
         </Link>
       </div>
     </div>
